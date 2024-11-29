@@ -1,23 +1,34 @@
-import React from 'react'
+'use client'
+
+import React, { useContext, useEffect, useState } from 'react'
 import LoginButton from '../UI/LoginButton';
 import LogoutButton from '../UI/LogoutButton';
+import Image from 'next/image';
+import { userProvider } from '../ContextProvider/ContextProvider';
 
-export const getServerSideProp = () => {
-    const user = sessionStorage.getItem('userData');
-    return { user };
+const HomePage = () => {
+    const [userData, setUserData] = useState(null);
+    const { user } = useContext(userProvider)
 
-}
+    useEffect(() => {
+        const storedUser = sessionStorage.getItem('userData');
+        if (storedUser) {
+            setUserData(JSON.parse(storedUser))
+        }
+    }, [user]);
 
-const HomePage = ({ user }) => {
     return (
         <div className='flex flex-col justify-center items-center w-full h-screen'>
             <div className='h-1/2'>
-                {user && <div className='flex flex-col gap-9'>
-                    <h1 className='text-center'>Welcome, {user.name}!</h1>
+                {userData && <div className='flex flex-col gap-9 items-center'>
+                    <h1 className='text-center'>Welcome, {userData?.displayName}!</h1>
+                    <span>
+                        <Image alt='profile' src={userData?.photoURL} className='w-20 h-20 object-cover rounded-full' width={20} height={20} />
+                    </span>
                     <LogoutButton />
                 </div>}
                 {
-                    !user && <div className='flex flex-col gap-9'>
+                    !userData && <div className='flex flex-col gap-9'>
                         <p className='text-xl text-black text-center'>Please login to access this page.</p>
                         <LoginButton />
                     </div>
